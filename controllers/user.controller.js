@@ -10,7 +10,6 @@ dotenv.config();
 const pass = process.env.PASS;
 const USERMAIL = process.env.USERMAIL;
 const transporter = nodemailer.createTransport({
-    // host: 'smtp.example.com',
     service: 'gmail',
     auth: {
       user: USERMAIL,
@@ -27,7 +26,6 @@ const registerUser = (req, res) => {
     })
     newUser.save()
       .then((result) => {
-        // console.log(result);
         res.status(200).json({ status: true, message: "User signed up successfully", result });
         console.log('✔ user found', email);
         const mailOptions = {
@@ -53,7 +51,7 @@ const registerUser = (req, res) => {
       .catch((err) => {
         console.error(err);
         if (err.code === 11000) {
-            res.status(409).json({ status: false, message: "Duplicate user found" });
+            res.status(409).json({ status: false, message: "Duplicate user found" || 'Username already in use' });
         } else {
             res.status(400).json({ status: false, message: err.message || "Fill in appropriately" });
         }
@@ -75,13 +73,15 @@ const registerUser = (req, res) => {
               console.log(token);
               res.status(200).json({ message: "User signed in successfully", status: true, token, user });
             } else {
-              res.status(401).json({ message: "Wrong password, please type the correct password", status: false });
+              res.status(401).json({ message: "Wrong password or email", status: false });
             }
           }
         });
       }
        else {
-        res.status(404).json({ message: "Wrong email, please type the correct email", status: false });
+        setTimeout(() => { 
+          res.status(404).json({ message: "Wrong email or password", status: false });
+        }, 3000);
       }
     } catch (err) {
       console.error(err);
@@ -128,7 +128,7 @@ const registerUser = (req, res) => {
       }
     })
     })
-  }
+  };
   const fetchMessage = async (req, res) => {
     console.log(req.query)
     const { userId, receiverId } = req.query;
@@ -141,4 +141,21 @@ const registerUser = (req, res) => {
         res.status(500).json({ status: false, error: 'Error fetching messages' });
     }
   };
+  const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
+
+// app.post('/user/sendVoiceMessage', upload.single('audio'), async (req, res) => {
+//     const { senderId, receiverId } = req.body;
+//     const { path } = req.file;
+
+//     const newMessage = new Message({
+//         senderId,
+//         receiverId,
+//         users: [senderId, receiverId],
+//         audioUrl: path,
+//     });
+
+//     await newMessage.save();
+//     res.status(200).json({ status: true, audioUrl: path });
+// });
   module.exports = {registerUser, userLogin, getDashboard, getAllUser, fetchMessage};

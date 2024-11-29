@@ -5,7 +5,8 @@ const messageSchema = new mongoose.Schema({
     receiverId: { type: String, required: true },
     users: { type: [String], required: true },
     content: { type: String, required: true },
-    timestamp: { type: Date, default: Date.now }
+    timestamp: { type: Date, default: Date.now },
+    audioUrl: { type: String }
 });
 
 const Message = mongoose.model('Message', messageSchema);
